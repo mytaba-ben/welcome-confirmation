@@ -540,25 +540,26 @@ async function processEventDayReminders() {
       const smsResult = await sendSMS(phone_number, smsBody, true);
       
       if (smsResult.success) {
-        // Update Airtable to mark reminder as sent (prevents duplicate sends)
+        // Update Airtable to mark reminder as sent with full timestamp (prevents duplicate sends)
         const now = new Date();
         const pacificTimeString = now.toLocaleString('en-US', { 
           timeZone: 'America/Los_Angeles',
           year: 'numeric',
           month: '2-digit',
-          day: '2-digit'
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: true
         });
-        // Format is MM/DD/YYYY, convert to YYYY-MM-DD
-        const [month, day, year] = pacificTimeString.split('/');
-        const dateOnly = `${year}-${month}-${day}`;
         
         const updated = await updateRecord(CONFIG.airtable.tables.orderInfo, orderId, {
-          sms_confirmation_reminder_sent_date: dateOnly
+          sms_confirmation_reminder_sent_date: pacificTimeString
         });
         
         if (updated) {
           sentCount++;
-          console.log(`✅ Order ${orderId}: Reminder SMS sent and recorded`);
+          console.log(`✅ Order ${orderId}: Reminder SMS sent and recorded at ${pacificTimeString}`);
         } else {
           failedCount++;
           console.log(`⚠️  Order ${orderId}: Reminder SMS sent but failed to update Airtable`);
