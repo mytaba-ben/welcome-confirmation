@@ -1,0 +1,28 @@
+{
+  "name": "welcome-confirmation-lambda",
+  "version": "1.0.0",
+  "description": "Sends confirmation SMS to primary customers and event-day reminders",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "jest",
+    "zip": "zip -r ../welcome-confirmation.zip . -x '*.git*' 'node_modules/aws-sdk/*' '.env' 'package-lock.json' '*.test.js'"
+  },
+  "keywords": [
+    "truvay",
+    "sms",
+    "confirmation",
+    "lambda"
+  ],
+  "author": "Truvay",
+  "license": "MIT",
+  "dependencies": {
+    "airtable": "^0.12.2",
+    "twilio": "^4.10.1",
+    "@aws-sdk/client-sesv2": "^3.560.0",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
