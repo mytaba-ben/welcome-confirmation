@@ -540,8 +540,11 @@ async function processEventDayReminders() {
       const smsResult = await sendSMS(phone_number, smsBody, true);
       
       if (smsResult.success) {
-        // Update Airtable to mark reminder as sent with full timestamp (prevents duplicate sends)
+        // Update Airtable to mark reminder as sent with timestamp in Pacific time
+        // TODO: In future, make this dynamic based on event_timezone field from order record
+        // For now, hardcoding to Pacific (America/Los_Angeles) as all Truvay events are in Pacific
         const now = new Date();
+        
         const pacificTimeString = now.toLocaleString('en-US', { 
           timeZone: 'America/Los_Angeles',
           year: 'numeric',
