@@ -540,9 +540,29 @@ async function processEventDayReminders() {
       const smsResult = await sendSMS(phone_number, smsBody, true);
       
       if (smsResult.success) {
-        // Don't update any fields - just log that reminder was sent
-        sentCount++;
-        console.log(`✅ Order ${orderId}: Reminder SMS sent`);
+        // Update Airtable to mark reminder as sent (prevents duplicate sends)
+        const now = new Date();
+        const pacificTimeString = now.toLocaleString('en-US', { 
+          timeZone: 'America/Los_Angeles',
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit'
+        });
+        // Format is MM/DD/YYYY, convert to YYYY-MM-DD
+        const [month, day, year] = pacificTimeString.split('/');
+        const dateOnly = `${year}-${month}-${day}`;
+        
+        const updated = await updateRecord(CONFIG.airtable.tables.orderInfo, orderId, {
+          sms_confirmation_reminder_sent_date: dateOnly
+        });
+        
+        if (updated) {
+          sentCount++;
+          console.log(`✅ Order ${orderId}: Reminder SMS sent and recorded`);
+        } else {
+          failedCount++;
+          console.log(`⚠️  Order ${orderId}: Reminder SMS sent but failed to update Airtable`);
+        }
       } else {
         failedCount++;
         console.log(`❌ Order ${orderId}: Reminder send failed - ${smsResult.error}`);
